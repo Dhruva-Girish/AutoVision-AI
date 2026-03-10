@@ -119,16 +119,6 @@ requirements.txt
 
 ---
 
-## Future Improvements
-
-* Lane detection
-* Pedestrian detection
-* Obstacle avoidance
-* Full autonomous robotic car control
-* Optimized inference on Raspberry Pi
-
----
-
 ## Author
 
 Developed as part of an **AI and Computer Vision autonomous driving project**.
