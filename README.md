@@ -40,7 +40,7 @@ Display Output / Vehicle Control
 * **YOLOv8 (Ultralytics)**
 * **OpenCV**
 * **PyTorch**
-* **Raspberry Pi 4**
+* **Raspberry Pi 4 2BG**
 * **SPI TFT Display**
 * **Raspberry Pi Camera Module**
 
