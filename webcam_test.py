@@ -3,57 +3,60 @@ import cv2
 import numpy as np
 from picamera2 import Picamera2
 
-print("Program started")
+print("AutoVision AI started")
 
-# Load model
 model = YOLO("autovision_model.pt")
 
-# Initialize Pi Camera
 picam2 = Picamera2()
 
 config = picam2.create_preview_configuration(
-    main={"format": "RGB888", "size": (320, 240)}
+    main={"format": "RGB888", "size": (320,240)}
 )
 
 picam2.configure(config)
 picam2.start()
 
-# Create larger window
 cv2.namedWindow("Traffic Sign Detector", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("Traffic Sign Detector", 960, 720)
-
-last_boxes = []
-last_colors = []
+cv2.resizeWindow("Traffic Sign Detector",960,720)
 
 frame_count = 0
+
+last_boxes = []
+last_labels = []
 
 while True:
 
     frame = picam2.capture_array()
     frame_count += 1
 
-    # Run YOLO every 3 frames for speed
+    # Run YOLO every 3 frames
     if frame_count % 3 == 0:
 
-        results = model(frame, imgsz=320, conf=0.4)[0]
+        results = model(frame, imgsz=320, conf=0.6, verbose=False)[0]
 
         last_boxes = []
-        last_colors = []
+        last_labels = []
 
         for box in results.boxes:
 
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
+            x1,y1,x2,y2 = map(int, box.xyxy[0])
+
+            # Remove giant false detections
+            box_area = (x2-x1)*(y2-y1)
+            frame_area = frame.shape[0]*frame.shape[1]
+
+            if box_area > 0.6*frame_area:
+                continue
 
             cls = int(box.cls[0])
             label = model.names[cls]
 
-            # STOP SIGN DETECTION
             if label == "stop_sign":
+
                 last_boxes.append((x1,y1,x2,y2))
-                last_colors.append("STOP")
+                last_labels.append("STOP")
                 continue
 
-            # TRAFFIC LIGHT DETECTION
             roi = frame[y1:y2, x1:x2]
 
             if roi.size == 0:
@@ -61,58 +64,50 @@ while True:
 
             roi = cv2.GaussianBlur(roi,(5,5),0)
 
-            gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 
-            h, w = gray.shape
+            red1 = cv2.inRange(hsv,(0,100,100),(10,255,255))
+            red2 = cv2.inRange(hsv,(160,100,100),(180,255,255))
+            red_mask = red1 + red2
 
-            top = gray[0:int(h/3), :]
-            middle = gray[int(h/3):int(2*h/3), :]
-            bottom = gray[int(2*h/3):h, :]
+            yellow_mask = cv2.inRange(hsv,(20,100,100),(35,255,255))
+            green_mask = cv2.inRange(hsv,(40,70,70),(90,255,255))
 
-            top_b = np.mean(top)
-            mid_b = np.mean(middle)
-            bot_b = np.mean(bottom)
+            red_pixels = cv2.countNonZero(red_mask)
+            yellow_pixels = cv2.countNonZero(yellow_mask)
+            green_pixels = cv2.countNonZero(green_mask)
 
-            bright_threshold = 200
+            m = max(red_pixels,yellow_pixels,green_pixels)
 
-            if top_b > bright_threshold and mid_b > bright_threshold and bot_b > bright_threshold:
-                color = "RYG"
+            if m == 0:
+                continue
 
+            if m == red_pixels:
+                color = "RED"
+            elif m == yellow_pixels:
+                color = "YELLOW"
             else:
-
-                max_val = max(top_b, mid_b, bot_b)
-
-                if max_val == top_b:
-                    color = "RED"
-
-                elif max_val == mid_b:
-                    color = "YELLOW"
-
-                else:
-                    color = "GREEN"
+                color = "GREEN"
 
             last_boxes.append((x1,y1,x2,y2))
-            last_colors.append(color)
+            last_labels.append(color)
 
-    # Draw boxes
+    # Draw detections (reused between frames)
+
     for i in range(len(last_boxes)):
 
         x1,y1,x2,y2 = last_boxes[i]
-        color = last_colors[i]
+        label = last_labels[i]
 
         cv2.rectangle(frame,(x1,y1),(x2,y2),(255,0,0),2)
 
-        cv2.putText(frame,color,(x1,y1-10),
+        cv2.putText(frame,label,(x1,y1-10),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6,(0,255,0),2)
+                    0.7,(0,255,0),2)
 
-    # Resize only for display
-    display = cv2.resize(frame,(960,720))
-
-    cv2.imshow("Traffic Sign Detector",display)
+    cv2.imshow("Traffic Sign Detector",frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
 
 cv2.destroyAllWindows()
