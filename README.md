@@ -45,10 +45,6 @@ OpenCV analyzes the detected traffic light region using **HSV color segmentation
 * 🟡 Yellow
 * 🟢 Green
 
-### 📊 Real YOLO FPS Monitoring
-
-Displays the **actual YOLO inference speed** on the screen.
-
 ### ⚡ Optimized for Embedded Systems
 
 Designed specifically for **Raspberry Pi CPU-only environments**.
