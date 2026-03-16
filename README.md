@@ -14,7 +14,6 @@ The project demonstrates how modern computer vision models can be deployed on **
 To make the system run smoothly on Raspberry Pi hardware, several performance optimizations were implemented:
 
 * ⚡ **Frame skipping (50%)** to increase inference speed
-* ⚡ **YOLO inference FPS measurement** instead of camera FPS
 * ⚡ **False detection filtering** to remove oversized bounding boxes
 * ⚡ **HSV-based color detection** for accurate traffic light classification
 * ⚡ **Low-resolution camera pipeline (320×240)** for faster inference
