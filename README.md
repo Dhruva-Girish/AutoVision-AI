@@ -51,7 +51,7 @@ Designed specifically for **Raspberry Pi CPU-only environments**.
 
 ### 📺 Real-Time Visualization
 
-Bounding boxes and traffic decisions are displayed on a live camera feed.
+Displays the action the vehicle takes.
 
 ---
 
@@ -84,7 +84,7 @@ Display Output / Vehicle Control
 
 * Raspberry Pi 4 (2GB)
 * Raspberry Pi Camera Module
-* SPI TFT Display
+* LCD Display
 
 ---
 
@@ -94,7 +94,7 @@ Display Output / Vehicle Control
 
 * Raspberry Pi 4
 * Raspberry Pi Camera Module
-* 2.4" SPI TFT Display
+* 2.4" LCD Display
 * Jumper Wires
 * MicroSD Card
 * Power Supply
@@ -130,8 +130,8 @@ yolo detect train model=yolov8n.pt data=data.yaml epochs=30 imgsz=320 batch=8
 | Component          | Performance                   |
 | ------------------ | ----------------------------- |
 | Camera FPS         | ~30 FPS                       |
-| YOLO Inference FPS | ~12–16 FPS                    |
-| Frame Skipping     | 1 frame skipped per inference |
+| YOLO Inference FPS | ~10–12 FPS                    |
+| Frame Skipping     | 4 frame skipped per inference |
 | Hardware           | Raspberry Pi 4 CPU            |
 
 ---
@@ -146,8 +146,9 @@ models/
 
 scripts/
    webcam_test.py
-   traffic_light_detection.py
-
+   autovision_model.pt
+   lcd_display.py
+   
 datasets/
    autovision_dataset/
 
