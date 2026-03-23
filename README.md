@@ -13,15 +13,15 @@ The project demonstrates how modern computer vision models can be deployed on **
 
 To make the system run smoothly on Raspberry Pi hardware, several performance optimizations were implemented:
 
-* ⚡ **Frame skipping (50%)** to increase inference speed
+* ⚡ **Frame skipping ** to increase inference speed
 * ⚡ **False detection filtering** to remove oversized bounding boxes
 * ⚡ **HSV-based color detection** for accurate traffic light classification
-* ⚡ **Low-resolution camera pipeline (320×240)** for faster inference
+* ⚡ **Low-resolution camera pipeline (192×144)** for YOLO detection and **(640x480)** for OpenCV Display
 * ⚡ **Efficient bounding-box reuse between frames**
 
 These improvements allow the system to reach approximately:
 
-**12–16 YOLO inference FPS on Raspberry Pi 4 CPU**
+**10–12 YOLO inference FPS on Raspberry Pi 4 CPU**
 
 without hardware acceleration.
 
